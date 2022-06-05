@@ -1,5 +1,5 @@
 import wollok.game.* 
-import juego.*
+import tetris.*
 
 object consola {
 
@@ -11,8 +11,10 @@ object consola {
 		new Juego(color = "Naranja"),
 		new Juego(color = "Violeta")
 	]
+	
 	var menu 
 	
+	//Resolución = 850x600
 	method initialize(){
 		game.height(12)
 		game.width(17)
@@ -24,16 +26,16 @@ object consola {
 		game.addVisual(menu)
 		juegos.forEach{juego=>menu.agregarItem(juego)}
 		menu.dibujar()
-		keyboard.enter().onPressDo{self.hacerIniciar(menu.itemSeleccionado())}
+		keyboard.enter().onPressDo{self.juegoIniciar(menu.itemSeleccionado())}
 		
 	}
 	
-	method hacerIniciar(juego){
+	method juegoIniciar(juego){
 		game.clear()
-		keyboard.q().onPressDo{self.hacerTerminar(juego)}
+		keyboard.q().onPressDo{self.juegoTerminar(juego)}
 		juego.iniciar()
 	}
-	method hacerTerminar(juego){
+	method juegoTerminar(juego){
 		juego.terminar()
 		game.clear()
 		self.iniciar()
@@ -91,5 +93,3 @@ class MenuIconos{
 		seleccionado = (seleccionado - 1).max(1)
 	}
 }
-
-
