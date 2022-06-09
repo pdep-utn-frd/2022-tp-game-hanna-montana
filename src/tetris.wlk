@@ -9,6 +9,12 @@ class Juego {
 		game.addVisual(fondo)
 		game.addVisual(pieza)
 		game.addVisual(reloj)
+		keyboard.down().onPressDo{
+			pieza.bajar()
+		}
+		keyboard.up().onPressDo{
+			pieza.subir()
+		}
 		game.onTick(100, "reloj", {reloj.contar()}) 
 	}
 	
@@ -42,24 +48,38 @@ object reloj{
 	
 	method contar(){
 		contador += 1
-		pieza.bajar()
+		pieza.derecha()
 	}
 }
 
 object pieza{
 	var property figura = "cuadrado"
 	var property color = "amarillo"
-	var property posicion = game.at(8,game.height()+1)
+	var property posicion = game.at(0,6)
 	method position() = posicion
 	method image() = "src/assets/img/" + figura + " - " + color + ".png"
 	
-	method bajar(){
-		if (posicion.y() == 0){
-			//Añadimos un nuevo objeto, problema que no podemos agregar los objetos que necesitamos en tiempo de ejecución (Creo)
-			const pieza2 = new PiezaFija(position = posicion, figura = figura, color = color)
-			game.addVisual(pieza2)
-			posicion = game.at(posicion.x(), game.height() + 1)
+	method derecha(){
+		if (posicion.x() == game.width()-2){
+			game.addVisual(new PiezaFija(position = posicion, figura = figura, color = color))
+			posicion = game.at(0,6)
 		}
-		posicion = posicion.down(1)
+		posicion = posicion.right(1)
 	}
+	
+	method bajar(){
+		if (posicion.y() != 0){
+			posicion = posicion.down(1)	
+		}
+	}
+	
+	method subir(){
+		if (posicion.y() != 10){
+			posicion = posicion.up(1)	
+		}
+	}
+}
+
+object posiciones {
+
 }
