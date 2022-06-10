@@ -35,6 +35,7 @@ class Juego {
 		game.onCollideDo(piezaInvisible1, {pieza => piezaPrincipal.chocar()})
 		game.onCollideDo(piezaInvisible2, {pieza => piezaPrincipal.chocar()})
 		game.onCollideDo(piezaInvisible3, {pieza => piezaPrincipal.chocar()})
+		piezaPrincipal.figura().iniciarPieza()
 	}
 	
 	method terminar(){
