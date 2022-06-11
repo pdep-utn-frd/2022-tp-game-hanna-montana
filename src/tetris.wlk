@@ -1,7 +1,7 @@
 import wollok.game.*
 import consola.*
 
-const posicionInicialPieza = game.at(0,6)
+const posicionInicialPieza = game.at(-2,6)		//Posicion desde la cual cae la pieza
 
 class Juego {
 	var property position = null
@@ -91,32 +91,28 @@ const piezaInvisible2 = new PiezaInvisible (position = game.at(-2, -2))
 const piezaInvisible3 = new PiezaInvisible (position = game.at(-3, -3))
 
 //Barrera del Piso
-const barrera1 = new PiezaInvisible (position = game.at(17, 1))
-const barrera2 = new PiezaInvisible (position = game.at(17, 2))
-const barrera3 = new PiezaInvisible (position = game.at(17, 3))
-const barrera4 = new PiezaInvisible (position = game.at(17, 4))
-const barrera5 = new PiezaInvisible (position = game.at(17, 5))
-const barrera6 = new PiezaInvisible (position = game.at(17, 6))
-const barrera7 = new PiezaInvisible (position = game.at(17, 7))
-const barrera8 = new PiezaInvisible (position = game.at(17, 8))
-const barrera9 = new PiezaInvisible (position = game.at(17, 9))
-const barrera10 = new PiezaInvisible (position = game.at(17, 10))
+const barrera1 = new PiezaInvisible (position = game.at(game.width(), 1))
+const barrera2 = new PiezaInvisible (position = game.at(game.width(), 2))
+const barrera3 = new PiezaInvisible (position = game.at(game.width(), 3))
+const barrera4 = new PiezaInvisible (position = game.at(game.width(), 4))
+const barrera5 = new PiezaInvisible (position = game.at(game.width(), 5))
+const barrera6 = new PiezaInvisible (position = game.at(game.width(), 6))
+const barrera7 = new PiezaInvisible (position = game.at(game.width(), 7))
+const barrera8 = new PiezaInvisible (position = game.at(game.width(), 8))
+const barrera9 = new PiezaInvisible (position = game.at(game.width(), 9))
+const barrera10 = new PiezaInvisible (position = game.at(game.width(), 10))
 
 
 object piezaPrincipal{
 	var property figura = cuadrado
 	var property position = posicionInicialPieza
-	var property ultimoMovimiento
+	var property ultimoMovimiento = "derecha"
 	method image() = "src/assets/img/" + figura + ".png"
 	
 	method derecha(){
-		if (position.x() != 17){
+		if (ultimoMovimiento == "derecha"){
 			figura.moverDerecha()
 		}
-		else{
-			self.chocar()
-		}
-		
 	}
 	
 	method bajar(){
@@ -135,6 +131,14 @@ object piezaPrincipal{
 	
 	method chocar(){
 		figura.chocar()
+	}
+}
+
+object colisiones{
+	method hayColision(visual1, visual2, visual3, visual4){
+		if ((game.colliders(visual1) == []) and (game.colliders(visual2) == []) and (game.colliders(visual3) == []) and (game.colliders(visual4) == [])){
+			piezaPrincipal.ultimoMovimiento("derecha")
+		}
 	}
 }
 
@@ -160,6 +164,7 @@ object cuadrado{
 		piezaInvisible3.position(piezaInvisible3.position().up(1))
 		piezaInvisible1.position(piezaInvisible1.position().up(1))
 		piezaPrincipal.position(piezaPrincipal.position().up(1))
+		colisiones.hayColision(piezaPrincipal, piezaInvisible1, piezaInvisible2, piezaInvisible3)
 	}
 	
 	method bajar(){
@@ -167,10 +172,11 @@ object cuadrado{
 		piezaInvisible1.position(piezaInvisible1.position().down(1))
 		piezaInvisible2.position(piezaInvisible2.position().down(1))
 		piezaInvisible3.position(piezaInvisible3.position().down(1))
+		colisiones.hayColision(piezaPrincipal, piezaInvisible1, piezaInvisible2, piezaInvisible3)
 	}
 	
 	method chocar(){
-		if (piezaPrincipal.ultimoMovimiento() == null){
+		if (piezaPrincipal.ultimoMovimiento() == "derecha"){
 			game.addVisual(new PiezaFija(position = piezaPrincipal.position().left(1), figura = piezaPrincipal.figura()))
 			game.addVisual(new PiezaInvisible(position = piezaInvisible1.position().left(1)))
 			game.addVisual(new PiezaInvisible(position = piezaInvisible2.position().left(1)))
@@ -179,11 +185,11 @@ object cuadrado{
 		}
 		if (piezaPrincipal.ultimoMovimiento() == "bajar"){
 			piezaPrincipal.subir()
-			piezaPrincipal.ultimoMovimiento(null)
+			piezaPrincipal.ultimoMovimiento("derecha")
 		}
 		if (piezaPrincipal.ultimoMovimiento() == "subir"){
 			piezaPrincipal.bajar()
-			piezaPrincipal.ultimoMovimiento(null)
+			piezaPrincipal.ultimoMovimiento("derecha")
 		}
 	}
 }
