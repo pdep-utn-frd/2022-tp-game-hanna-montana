@@ -1,7 +1,7 @@
 import wollok.game.*
 import consola.*
 
-const posicionInicial = game.at(0,6)
+const posicionInicialPieza = game.at(0,6)
 
 class Juego {
 	var property position = null
@@ -30,6 +30,9 @@ class Juego {
 		keyboard.up().onPressDo{
 			piezaPrincipal.subir()
 		}
+		keyboard.r().onPressDo{
+			self.reiniciar()
+		}
 		game.onTick(100, "reloj", {reloj.contar()})
 		game.onCollideDo(piezaPrincipal, {pieza => piezaPrincipal.chocar()})
 		game.onCollideDo(piezaInvisible1, {pieza => piezaPrincipal.chocar()})
@@ -39,9 +42,16 @@ class Juego {
 	}
 	
 	method terminar(){
-
+		game.stop()
 	}
-	method image() = "juego" + color + ".png"
+	
+	method reiniciar(){
+		game.clear()
+		self.iniciar()
+		reloj.contador(0)
+	}
+	
+	method image() = "src/assets/img/tetrisLogo.png"
 	
 
 }
@@ -65,9 +75,9 @@ object fondo{
 object reloj{
 	var property contador = 0
 	
-	method text() = contador.toString()
+	method text() = "Puntaje: " + contador.toString()
 	method textColor() = "FFFFFF"
-	method position() = game.at(0,11)
+	method position() = game.at(1,11)
 	
 	method contar(){
 		contador += 1
@@ -95,21 +105,30 @@ const barrera10 = new PiezaInvisible (position = game.at(17, 10))
 
 object piezaPrincipal{
 	var property figura = cuadrado
-	var property position = posicionInicial
+	var property position = posicionInicialPieza
+	var property ultimoMovimiento
 	method image() = "src/assets/img/" + figura + ".png"
 	
 	method derecha(){
-		figura.moverDerecha()
+		if (position.x() != 17){
+			figura.moverDerecha()
+		}
+		else{
+			self.chocar()
+		}
+		
 	}
 	
 	method bajar(){
 		if (position.y() != 1){
+			ultimoMovimiento = "bajar"
 			figura.bajar()
 		}
 	}
 	
 	method subir(){
 		if (position.y() != 9){
+			ultimoMovimiento = "subir"
 			figura.subir()
 		}
 	}
@@ -120,13 +139,13 @@ object piezaPrincipal{
 }
 
 //A la hora de definir los movimientos de cada pieza hay que tener en cuenta las posiciones relativas a las otras piezas
-//para no mover una pieza en otra y disparar una colisión.
+//para no mover una pieza encima de otra y disparar una colisión.
 object cuadrado{
 	method iniciarPieza(){																	// 3 - 2
-		piezaInvisible1.position(posicionInicial.right(1))									// P - 1
-		piezaInvisible2.position(posicionInicial.up(1).right(1))
-		piezaInvisible3.position(posicionInicial.up(1))
-		piezaPrincipal.position(posicionInicial)
+		piezaInvisible1.position(posicionInicialPieza.right(1))								// P - 1
+		piezaInvisible2.position(posicionInicialPieza.up(1).right(1))
+		piezaInvisible3.position(posicionInicialPieza.up(1))
+		piezaPrincipal.position(posicionInicialPieza)
 	}
 	
 	method moverDerecha(){
@@ -151,10 +170,20 @@ object cuadrado{
 	}
 	
 	method chocar(){
-		game.addVisual(new PiezaFija(position = piezaPrincipal.position().left(1), figura = piezaPrincipal.figura()))
-		game.addVisual(new PiezaInvisible(position = piezaInvisible1.position().left(1)))
-		game.addVisual(new PiezaInvisible(position = piezaInvisible2.position().left(1)))
-		game.addVisual(new PiezaInvisible(position = piezaInvisible3.position().left(1)))
-		self.iniciarPieza()
+		if (piezaPrincipal.ultimoMovimiento() == null){
+			game.addVisual(new PiezaFija(position = piezaPrincipal.position().left(1), figura = piezaPrincipal.figura()))
+			game.addVisual(new PiezaInvisible(position = piezaInvisible1.position().left(1)))
+			game.addVisual(new PiezaInvisible(position = piezaInvisible2.position().left(1)))
+			game.addVisual(new PiezaInvisible(position = piezaInvisible3.position().left(1)))
+			self.iniciarPieza()
+		}
+		if (piezaPrincipal.ultimoMovimiento() == "bajar"){
+			piezaPrincipal.subir()
+			piezaPrincipal.ultimoMovimiento(null)
+		}
+		if (piezaPrincipal.ultimoMovimiento() == "subir"){
+			piezaPrincipal.bajar()
+			piezaPrincipal.ultimoMovimiento(null)
+		}
 	}
 }
