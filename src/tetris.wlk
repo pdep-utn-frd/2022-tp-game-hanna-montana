@@ -2,7 +2,7 @@ import wollok.game.*
 import consola.*
 
 const posicionInicialPieza = game.at(-2,6)										//Posicion desde la cual cae la pieza
-const formas = [cuadrado, i, lDerecha, lIzquierda, nDerecha, nIzquierda, t]		//Colección de las piezas
+const formas = [cuadrado, i, lDerecha, lIzquierda, nDerecha, nIzquierda, t]		//Colección de las figuras
 
 class Juego {
 	var property position = null
@@ -176,28 +176,26 @@ object columna3 inherits ColumnaLlena(x=11) {}
 
 object piezaActual{
 	var numeroFigura = 0.randomUpTo(6)
-	var property figura = t
+	var property figura = formas.get(numeroFigura)
 	var property ultimoMovimiento = "derecha"
-	
-	method image() = "src/assets/img/piezaBase.png"
 	
 	method derecha(){
 		if (ultimoMovimiento == "derecha"){
-			figura.moverDerecha()
+			movimientosFiguras.moverDerecha()
 		}
 	}
 	
 	method bajar(){
 		if (pieza4.position().y() != 1){	//La pieza 4 siempre está abajo
 			ultimoMovimiento = "bajar"
-			figura.bajar()
+			movimientosFiguras.bajar()
 		}
 	}
 	
 	method subir(){ 
 		if (pieza1.position().y() != 10){	//La pieza 1 siempre está arriba
 			ultimoMovimiento = "subir"
-			figura.subir()
+			movimientosFiguras.subir()
 		}
 	}
 	
@@ -207,13 +205,8 @@ object piezaActual{
 	
 	method cambiarPieza(){
 		numeroFigura = 0.randomUpTo(6)
-		if (numeroFigura == 5){
-			figura = "nada"
-			nIzquierda.iniciarPieza()
-		}else{
-			figura = formas.get(numeroFigura)
-			figura.iniciarPieza()
-		}
+		figura = formas.get(numeroFigura)
+		figura.iniciarPieza()
 	}
 }
 
@@ -226,10 +219,10 @@ object colisiones{
 	
 	method figuraChocar(){
 		if (piezaActual.ultimoMovimiento() == "derecha"){
-			game.addVisual(new Pieza(position = pieza4.position().left(1)))
 			game.addVisual(new Pieza(position = pieza1.position().left(1)))
 			game.addVisual(new Pieza(position = pieza2.position().left(1)))
 			game.addVisual(new Pieza(position = pieza3.position().left(1)))
+			game.addVisual(new Pieza(position = pieza4.position().left(1)))
 			piezaActual.cambiarPieza()
 		}
 		if (piezaActual.ultimoMovimiento() == "bajar"){
@@ -268,24 +261,17 @@ object colisiones{
 //A la hora de definir los movimientos de cada pieza hay que tener en cuenta las posiciones relativas a las otras piezas
 //para no mover una pieza encima de otra y disparar una colisión.
 
-object cuadrado{
-	method iniciarPieza(){																	// 1 - 2
-		pieza3.position(posicionInicialPieza.right(1))										// 4 - 3
-		pieza2.position(posicionInicialPieza.up(1).right(1))
-		pieza1.position(posicionInicialPieza.up(1))
-		pieza4.position(posicionInicialPieza)
-	}
-	
+object movimientosFiguras{
 	method moverDerecha(){
+		pieza4.position(pieza4.position().right(1))
 		pieza3.position(pieza3.position().right(1))
 		pieza2.position(pieza2.position().right(1))
 		pieza1.position(pieza1.position().right(1))
-		pieza4.position(pieza4.position().right(1))
 	}
 	
 	method subir(){
-		pieza2.position(pieza2.position().up(1))
 		pieza1.position(pieza1.position().up(1))
+		pieza2.position(pieza2.position().up(1))
 		pieza3.position(pieza3.position().up(1))
 		pieza4.position(pieza4.position().up(1))
 		colisiones.hayColision(pieza1, pieza2, pieza3, pieza4)
@@ -300,195 +286,65 @@ object cuadrado{
 	}
 }
 
-object i{
-	method iniciarPieza(){																	//4 - 1 - 2 - 3
-		pieza4.position(posicionInicialPieza.left(3))
-		pieza1.position(posicionInicialPieza.left(2))
-		pieza2.position(posicionInicialPieza.left(1))
-		pieza3.position(posicionInicialPieza)
+object cuadrado{																			// 1 - 2
+	method iniciarPieza(){																	// 3 - 4
+		pieza1.position(posicionInicialPieza.left(1).up(1))
+		pieza2.position(posicionInicialPieza.up(1))
+		pieza3.position(posicionInicialPieza.left(1))
+		pieza4.position(posicionInicialPieza)
 	}
-	
-	method moverDerecha(){
-		pieza3.position(pieza3.position().right(1))
-		pieza2.position(pieza2.position().right(1))
-		pieza1.position(pieza1.position().right(1))
-		pieza4.position(pieza4.position().right(1))
-	}
-	
-	method subir(){
-		pieza2.position(pieza2.position().up(1))
-		pieza3.position(pieza3.position().up(1))
-		pieza1.position(pieza1.position().up(1))
-		pieza4.position(pieza4.position().up(1))
-		colisiones.hayColision(pieza1, pieza2, pieza3, pieza4)
-	}
-	
-	method bajar(){
-		pieza4.position(pieza4.position().down(1))
-		pieza1.position(pieza1.position().down(1))
-		pieza2.position(pieza2.position().down(1))
-		pieza3.position(pieza3.position().down(1))
-		colisiones.hayColision(pieza1, pieza2, pieza3, pieza4)
+}
+
+object i{																					//1 - 2 - 3 - 4
+	method iniciarPieza(){
+		pieza1.position(posicionInicialPieza.left(3))
+		pieza2.position(posicionInicialPieza.left(2))
+		pieza3.position(posicionInicialPieza.left(1))
+		pieza4.position(posicionInicialPieza)
 	}
 }
 
 object lDerecha{																			//		  1
-	method iniciarPieza(){																	//4 - 3 - 2
-		pieza4.position(posicionInicialPieza.left(2))
-		pieza3.position(posicionInicialPieza.left(1))
-		pieza2.position(posicionInicialPieza)
+	method iniciarPieza(){																	//2 - 3 - 4
 		pieza1.position(posicionInicialPieza.up(1))
-	}
-	
-	method moverDerecha(){
-		pieza1.position(pieza1.position().right(1))
-		pieza2.position(pieza2.position().right(1))
-		pieza3.position(pieza3.position().right(1))
-		pieza4.position(pieza4.position().right(1))
-	}
-	
-	method subir(){
-		pieza1.position(pieza1.position().up(1))
-		pieza2.position(pieza2.position().up(1))
-		pieza3.position(pieza3.position().up(1))
-		pieza4.position(pieza4.position().up(1))
-		colisiones.hayColision(pieza1, pieza2, pieza3, pieza4)
-	}
-	
-	method bajar(){
-		pieza4.position(pieza4.position().down(1))
-		pieza3.position(pieza3.position().down(1))
-		pieza2.position(pieza2.position().down(1))
-		pieza1.position(pieza1.position().down(1))
-		colisiones.hayColision(pieza1, pieza2, pieza3, pieza4)
+		pieza2.position(posicionInicialPieza.left(2))
+		pieza3.position(posicionInicialPieza.left(1))
+		pieza4.position(posicionInicialPieza)
 	}
 }
 
 object lIzquierda{																			//1
-	method iniciarPieza(){																	//4 - 3 - 2
-		pieza4.position(posicionInicialPieza.left(2))
+	method iniciarPieza(){																	//2 - 3 - 4
+		pieza1.position(posicionInicialPieza.left(2).up(1))
+		pieza2.position(posicionInicialPieza.left(2))
 		pieza3.position(posicionInicialPieza.left(1))
-		pieza2.position(posicionInicialPieza)
-		pieza1.position(posicionInicialPieza.up(1).left(2))
-	}
-	
-	method moverDerecha(){
-		pieza1.position(pieza1.position().right(1))
-		pieza2.position(pieza2.position().right(1))
-		pieza3.position(pieza3.position().right(1))
-		pieza4.position(pieza4.position().right(1))
-	}
-	
-	method subir(){
-		pieza1.position(pieza1.position().up(1))
-		pieza2.position(pieza2.position().up(1))
-		pieza3.position(pieza3.position().up(1))
-		pieza4.position(pieza4.position().up(1))
-		colisiones.hayColision(pieza1, pieza2, pieza3, pieza4)
-	}
-	
-	method bajar(){
-		pieza4.position(pieza4.position().down(1))
-		pieza3.position(pieza3.position().down(1))
-		pieza2.position(pieza2.position().down(1))
-		pieza1.position(pieza1.position().down(1))
-		colisiones.hayColision(pieza1, pieza2, pieza3, pieza4)
+		pieza4.position(posicionInicialPieza)
 	}
 }
 
 object nDerecha{																			//	  1
-	method iniciarPieza(){																	//3 - 2
-		pieza4.position(posicionInicialPieza.down(1).left(1))								//4
-		pieza1.position(posicionInicialPieza.up(1))
-		pieza2.position(posicionInicialPieza)
-		pieza3.position(posicionInicialPieza.left(1))
-	}
-	
-	method moverDerecha(){
-		pieza4.position(pieza4.position().right(1))
-		pieza2.position(pieza2.position().right(1))
-		pieza3.position(pieza3.position().right(1))
-		pieza1.position(pieza1.position().right(1))
-	}
-	
-	method subir(){
-		pieza1.position(pieza1.position().up(1))
-		pieza2.position(pieza2.position().up(1))
-		pieza3.position(pieza3.position().up(1))
-		pieza4.position(pieza4.position().up(1))
-		colisiones.hayColision(pieza1, pieza2, pieza3, pieza4)
-	}
-	
-	method bajar(){
-		pieza4.position(pieza4.position().down(1))
-		pieza3.position(pieza3.position().down(1))
-		pieza2.position(pieza2.position().down(1))
-		pieza1.position(pieza1.position().down(1))
-		colisiones.hayColision(pieza1, pieza2, pieza3, pieza4)
+	method iniciarPieza(){																	//2 - 3
+		pieza1.position(posicionInicialPieza.up(1))											//4
+		pieza2.position(posicionInicialPieza.left(1))
+		pieza3.position(posicionInicialPieza)
+		pieza4.position(posicionInicialPieza.left(1).down(1))
 	}
 }
 
 object nIzquierda{																			//1
-	method iniciarPieza(){																	//3 - 2
-		pieza4.position(posicionInicialPieza.down(1))										//	  4
-		pieza1.position(posicionInicialPieza.left(1).up(1))
-		pieza2.position(posicionInicialPieza)
-		pieza3.position(posicionInicialPieza.left(1))
-	}
-	
-	method moverDerecha(){
-		pieza2.position(pieza2.position().right(1))
-		pieza1.position(pieza1.position().right(1))
-		pieza3.position(pieza3.position().right(1))
-		pieza4.position(pieza4.position().right(1))
-	}
-	
-	method subir(){
-		pieza1.position(pieza1.position().up(1))
-		pieza2.position(pieza2.position().up(1))
-		pieza3.position(pieza3.position().up(1))
-		pieza4.position(pieza4.position().up(1))
-		colisiones.hayColision(pieza1, pieza2, pieza3, pieza4)
-	}
-	
-	method bajar(){
-		pieza4.position(pieza4.position().down(1))
-		//piezaInvisible4.position(piezaInvisible4.position().down(1))
-		pieza3.position(pieza3.position().down(1))
-		pieza2.position(pieza2.position().down(1))
-		pieza1.position(pieza1.position().down(1))
-		colisiones.hayColision(pieza1, pieza2, pieza3, pieza4)
+	method iniciarPieza(){																	//2 - 3
+		pieza1.position(posicionInicialPieza.left(1).up(1))									//	  4
+		pieza2.position(posicionInicialPieza.left(1))
+		pieza3.position(posicionInicialPieza)
+		pieza4.position(posicionInicialPieza.down(1))
 	}
 }
 
 object t{																					//	  1
-	method iniciarPieza(){																	//4 - 3 - 2
-		pieza4.position(posicionInicialPieza.left(2))
+	method iniciarPieza(){																	//2 - 3 - 4
 		pieza1.position(posicionInicialPieza.left(1).up(1))
-		pieza2.position(posicionInicialPieza)
+		pieza2.position(posicionInicialPieza.left(2))
 		pieza3.position(posicionInicialPieza.left(1))
-	}
-	
-	method moverDerecha(){
-		pieza2.position(pieza2.position().right(1))
-		pieza3.position(pieza3.position().right(1))
-		pieza4.position(pieza4.position().right(1))
-		pieza1.position(pieza1.position().right(1))
-	}
-	
-	method subir(){
-		pieza1.position(pieza1.position().up(1))
-		pieza2.position(pieza2.position().up(1))
-		pieza3.position(pieza3.position().up(1))
-		pieza4.position(pieza4.position().up(1))
-		colisiones.hayColision(pieza1, pieza2, pieza3, pieza4)
-	}
-	
-	method bajar(){
-		pieza4.position(pieza4.position().down(1))
-		pieza3.position(pieza3.position().down(1))
-		pieza2.position(pieza2.position().down(1))
-		pieza1.position(pieza1.position().down(1))
-		colisiones.hayColision(pieza1, pieza2, pieza3, pieza4)
+		pieza4.position(posicionInicialPieza)
 	}
 }
