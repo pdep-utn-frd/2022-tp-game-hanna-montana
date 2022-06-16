@@ -136,7 +136,13 @@ object piezaPrincipal{
 
 object colisiones{
 	method hayColision(visual1, visual2, visual3, visual4){
-		if ((game.colliders(visual1) == []) and (game.colliders(visual2) == []) and (game.colliders(visual3) == []) and (game.colliders(visual4) == [])){
+		if ((game.colliders(visual1) == [])
+			and 
+			(game.colliders(visual2) == [])
+			and
+			(game.colliders(visual3) == [])
+			and (game.colliders(visual4) == [])
+		){
 			piezaPrincipal.ultimoMovimiento("derecha")
 		}
 	}
@@ -191,5 +197,26 @@ object cuadrado{
 			piezaPrincipal.bajar()
 			piezaPrincipal.ultimoMovimiento("derecha")
 		}
+	}
+}
+
+object matrix {
+	const tablero = [
+		[1,1,1,1,1],
+		[0,0,0,0,0],
+		[0,0,0,0,0],
+		[0,0,0,0,0],
+		[0,0,0,0,0],
+		[0,0,0,0,0],
+		[1,1,1,1,1],
+		[0,0,0,0,0] 
+	]
+	
+	method refresh() {
+		
+	}
+	
+	method is_filled() {
+		return tablero.filter{column => column.sum() == 5}
 	}
 }
