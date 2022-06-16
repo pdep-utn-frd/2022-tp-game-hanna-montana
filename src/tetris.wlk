@@ -24,6 +24,9 @@ class Juego {
 		game.addVisual(barrera9)
 		game.addVisual(barrera10)
 		game.addVisual(reloj)
+		game.addVisual(columna1)
+		game.addVisual(columna2)
+		game.addVisual(columna3)
 		keyboard.down().onPressDo{
 			piezaPrincipal.bajar()
 		}
@@ -84,6 +87,61 @@ object reloj{
 		piezaPrincipal.derecha()
 	}
 }
+
+class ColumnaLlena {
+	var llena = false	
+	var x;
+	method text() = x.toString()+"-llena: " + llena.toString()
+	method textColor() = "FFFFFF"
+	method position() = game.at(x,11)
+	
+	method esta_llena() {
+		llena = self.generador_columna().all{posicion => game.getObjectsIn(posicion).size() == 1}
+		return llena
+	}
+	
+	method generador_columna() {	
+		return [
+			game.at(x,1),
+			game.at(x,2),
+			game.at(x,3),
+			game.at(x,4),
+			game.at(x,5),
+			game.at(x,6),
+			game.at(x,7),
+			game.at(x,8),
+			game.at(x,9)
+		]
+	}
+	
+	method todas_las_posiciones_posibles() {
+		return [
+			game.at(x+1,1),
+			game.at(x+1,2),
+			game.at(x+1,3),
+			game.at(x+1,4),
+			game.at(x+1,5),
+			game.at(x+1,6),
+			game.at(x+1,7),
+			game.at(x+1,8),
+			game.at(x+1,9),
+			game.at(x,1),
+			game.at(x,2),
+			game.at(x,3),
+			game.at(x,4),
+			game.at(x,5),
+			game.at(x,6),
+			game.at(x,7),
+			game.at(x,8),
+			game.at(x,9)	
+		]
+	}
+	
+}
+
+object columna1 inherits ColumnaLlena(x=15) {}
+object columna2 inherits ColumnaLlena(x=13) {}
+object columna3 inherits ColumnaLlena(x=11) {}
 
 //Piezas que acompañan a la principal (Para las colisiones)
 const piezaInvisible1 = new PiezaInvisible (position = game.at(-1, -1))
@@ -197,26 +255,30 @@ object cuadrado{
 			piezaPrincipal.bajar()
 			piezaPrincipal.ultimoMovimiento("derecha")
 		}
-	}
+		
+		const POSIBLES_COLUMNAS_LLENAS = 
+		[columna1,
+		columna2,
+		columna3]
+		POSIBLES_COLUMNAS_LLENAS.forEach{columna => columna.esta_llena()}
+		
+		/*
+		 * ALGORITMO PARA ROMPER LINEAS (FALTA TERMINAR) NO TOCAR XDDD
+		
+		const columnas_llenas = posibles_columnas_llenas.filter{columna => columna.esta_llena() == true}
+		const posiciones_a_remover = columnas_llenas.map{columna => columna.todas_las_posiciones_posibles()}
+		posiciones_a_remover.forEach{
+			pares_ordenados =>
+			pares_ordenados.forEach{
+			par_ordenado => 
+				{
+						if (game.getObjectsIn(par_ordenado).size() == 1) 
+						{
+							game.removeVisual(game.getObjectsIn(par_ordenado).first())
+						}
+				}
+			}
+		}*/
+	}	
 }
 
-object matrix {
-	const tablero = [
-		[1,1,1,1,1],
-		[0,0,0,0,0],
-		[0,0,0,0,0],
-		[0,0,0,0,0],
-		[0,0,0,0,0],
-		[0,0,0,0,0],
-		[1,1,1,1,1],
-		[0,0,0,0,0] 
-	]
-	
-	method refresh() {
-		
-	}
-	
-	method is_filled() {
-		return tablero.filter{column => column.sum() == 5}
-	}
-}
