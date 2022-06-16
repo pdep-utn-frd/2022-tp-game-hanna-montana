@@ -43,6 +43,7 @@ class Juego {
 		game.onCollideDo(pieza2, {pieza => piezaActual.chocar()})
 		game.onCollideDo(pieza3, {pieza => piezaActual.chocar()})
 		game.onCollideDo(pieza4, {pieza => piezaActual.chocar()})
+		piezaActual.cambiarPieza()
 		piezaActual.figura().iniciarPieza()
 	}
 	
@@ -61,25 +62,17 @@ class Juego {
 
 }
 
-class PiezaFija {
-	var property position
-	var property figura
-   
-	method image() = "src/assets/img/" + figura + ".png"
-}
-
 class PiezaInvisible {
 	var property position
 }
 
-class PiezaInvisibleConImagen {
-	var property position
-	var property image
-}
-
 class Pieza {
 	var property position
-	var property image = "src/assets/img/piezaBase.png"
+	var property image = "src/assets/img/cuadrado.png"
+	
+	method cambiarColor(pieza){
+		image = "src/assets/img/" + pieza + ".png"
+	}
 }
 //No se usa game.boardGround() porque no se pueden definir dos fondos diferentes
 object fondo{
@@ -175,8 +168,8 @@ object columna3 inherits ColumnaLlena(x=11) {}
 
 
 object piezaActual{
-	var numeroFigura = 0.randomUpTo(6)
-	var property figura = formas.get(numeroFigura)
+	var numeroFigura
+	var property figura
 	var property ultimoMovimiento = "derecha"
 	
 	method derecha(){
@@ -206,6 +199,10 @@ object piezaActual{
 	method cambiarPieza(){
 		numeroFigura = 0.randomUpTo(6)
 		figura = formas.get(numeroFigura)
+		pieza1.cambiarColor(figura)
+		pieza2.cambiarColor(figura)
+		pieza3.cambiarColor(figura)
+		pieza4.cambiarColor(figura)
 		figura.iniciarPieza()
 	}
 }
@@ -219,10 +216,10 @@ object colisiones{
 	
 	method figuraChocar(){
 		if (piezaActual.ultimoMovimiento() == "derecha"){
-			game.addVisual(new Pieza(position = pieza1.position().left(1)))
-			game.addVisual(new Pieza(position = pieza2.position().left(1)))
-			game.addVisual(new Pieza(position = pieza3.position().left(1)))
-			game.addVisual(new Pieza(position = pieza4.position().left(1)))
+			game.addVisual(new Pieza(position = pieza1.position().left(1), image = "src/assets/img/" + piezaActual.figura() + ".png"))
+			game.addVisual(new Pieza(position = pieza2.position().left(1), image = "src/assets/img/" + piezaActual.figura() + ".png"))
+			game.addVisual(new Pieza(position = pieza3.position().left(1), image = "src/assets/img/" + piezaActual.figura() + ".png"))
+			game.addVisual(new Pieza(position = pieza4.position().left(1), image = "src/assets/img/" + piezaActual.figura() + ".png"))
 			piezaActual.cambiarPieza()
 		}
 		if (piezaActual.ultimoMovimiento() == "bajar"){
