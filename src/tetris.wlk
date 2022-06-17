@@ -28,11 +28,15 @@ class Juego {
 		game.addVisual(columna1)
 		game.addVisual(columna2)
 		game.addVisual(columna3)
+		
 		keyboard.down().onPressDo{
 			piezaActual.bajar()
 		}
 		keyboard.up().onPressDo{
 			piezaActual.subir()
+		}
+		keyboard.z().onPressDo{
+			piezaActual.rotarDerecha()
 		}
 		keyboard.r().onPressDo{
 			piezaActual.cambiarPieza()
@@ -76,7 +80,7 @@ class Pieza {
 }
 //No se usa game.boardGround() porque no se pueden definir dos fondos diferentes
 object fondo{
-	method position() = game.origin()
+	method position() = game.origin().left(1) //La posicion del fondo es (-1,0) para que el objeto que lo contiene no colisione con nada
 	method image() = "src/assets/img/background.png"
 }
 
@@ -171,6 +175,7 @@ object piezaActual{
 	var numeroFigura
 	var property figura
 	var property ultimoMovimiento = "derecha"
+	var property rotacion = 0
 	
 	method derecha(){
 		if (ultimoMovimiento == "derecha"){
@@ -196,6 +201,10 @@ object piezaActual{
 		colisiones.figuraChocar()
 	}
 	
+	method rotarDerecha(){
+		figura.rotarDerecha()
+	}
+	
 	method cambiarPieza(){
 		numeroFigura = 0.randomUpTo(6)
 		figura = formas.get(numeroFigura)
@@ -203,6 +212,7 @@ object piezaActual{
 		pieza2.cambiarColor(figura)
 		pieza3.cambiarColor(figura)
 		pieza4.cambiarColor(figura)
+		rotacion = 0
 		figura.iniciarPieza()
 	}
 }
@@ -290,6 +300,9 @@ object cuadrado{																			// 1 - 2
 		pieza3.position(posicionInicialPieza.left(1))
 		pieza4.position(posicionInicialPieza)
 	}
+	method rotarDerecha(){
+		//No hacemos nada ya que no tiene sentido rotar el cuadrado
+	}
 }
 
 object i{																					//1 - 2 - 3 - 4
@@ -298,6 +311,20 @@ object i{																					//1 - 2 - 3 - 4
 		pieza2.position(posicionInicialPieza.left(2))
 		pieza3.position(posicionInicialPieza.left(1))
 		pieza4.position(posicionInicialPieza)
+	}
+	
+	method rotarDerecha(){
+		if (piezaActual.rotacion() == 0){
+			pieza1.position(pieza1.position().right(2).up(2))
+			pieza2.position(pieza2.position().right(1).up(1))
+			pieza4.position(pieza4.position().left(1).down(1))
+			piezaActual.rotacion(1)
+		}else if (piezaActual.rotacion() == 1){
+			pieza1.position(pieza1.position().left(2).down(2))
+			pieza2.position(pieza2.position().left(1).down(1))
+			pieza4.position(pieza4.position().right(1).up(1))
+			piezaActual.rotacion(0)
+		}
 	}
 }
 
@@ -343,5 +370,26 @@ object t{																					//	  1
 		pieza2.position(posicionInicialPieza.left(2))
 		pieza3.position(posicionInicialPieza.left(1))
 		pieza4.position(posicionInicialPieza)
+	}
+	
+	method rotarDerecha(){
+		if (piezaActual.rotacion() == 0){
+			pieza2.position(pieza2.position().right(1))
+			pieza3.position(pieza3.position().right(1))
+			pieza4.position(pieza4.position().left(1).down(1))
+			piezaActual.rotacion(1)
+		}else if (piezaActual.rotacion() == 1){
+			pieza1.position(pieza1.position().left(1).down(1))
+			piezaActual.rotacion(2)
+		}else if (piezaActual.rotacion() == 2){
+			pieza1.position(pieza1.position().right(1).up(1))
+			pieza2.position(pieza2.position().left(1))
+			pieza3.position(pieza3.position().left(1))
+			piezaActual.rotacion(3)
+		}else if (piezaActual.rotacion() == 3){
+			pieza4.position(pieza4.position().right(1).up(1))
+			piezaActual.rotacion(0)
+		}
+		
 	}
 }
