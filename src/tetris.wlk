@@ -35,6 +35,9 @@ class Juego {
 		keyboard.up().onPressDo{
 			piezaActual.subir()
 		}
+		keyboard.right().onPressDo{
+			piezaActual.derecha()
+		}
 		keyboard.z().onPressDo{
 			piezaActual.rotarDerecha()
 		}
@@ -42,7 +45,7 @@ class Juego {
 			piezaActual.cambiarPieza()
 			self.reiniciar()
 		}
-		game.onTick(100, "reloj", {reloj.contar()})
+		game.onTick(500, "reloj", {reloj.contar()})
 		game.onCollideDo(pieza1, {pieza => piezaActual.chocar()})
 		game.onCollideDo(pieza2, {pieza => piezaActual.chocar()})
 		game.onCollideDo(pieza3, {pieza => piezaActual.chocar()})
@@ -117,7 +120,7 @@ const barrera10 = new PiezaInvisible (position = game.at(game.width(), 10))
 
 class ColumnaLlena {
 	var llena = false
-	var x;
+	var x
 	method text() = x.toString()+" - Llena: " + llena.toString()
 	method textColor() = "FFFFFF"
 	method position() = game.at(x,11)
@@ -179,21 +182,21 @@ object piezaActual{
 	
 	method derecha(){
 		if (ultimoMovimiento == "derecha"){
-			movimientosFiguras.moverDerecha()
+			movimientosFiguras.moverDerecha(1)
 		}
 	}
 	
 	method bajar(){
 		if (pieza4.position().y() != 1){	//La pieza 4 siempre está abajo
 			ultimoMovimiento = "bajar"
-			movimientosFiguras.bajar()
+			movimientosFiguras.bajar(1)
 		}
 	}
 	
 	method subir(){ 
 		if (pieza1.position().y() != 10){	//La pieza 1 siempre está arriba
 			ultimoMovimiento = "subir"
-			movimientosFiguras.subir()
+			movimientosFiguras.subir(1)
 		}
 	}
 	
@@ -221,6 +224,14 @@ object colisiones{
 	method hayColision(visual1, visual2, visual3, visual4){
 		if ((game.colliders(visual1) == []) and (game.colliders(visual2) == []) and (game.colliders(visual3) == []) and (game.colliders(visual4) == [])){
 			piezaActual.ultimoMovimiento("derecha")
+		}
+	}
+	
+	method hayColisionSuperiorInferior(){
+		if ((pieza1.position().y() >= 10) or (pieza2.position().y() >= 10) or (pieza3.position().y() >= 10) or (pieza4.position().y() >= 10)){
+			movimientosFiguras.bajar(pieza1.position().y().max(pieza2.position().y()).max(pieza3.position().y()).max(pieza4.position().y()) - 9)
+		}else if ((pieza1.position().y() <= 1) or (pieza2.position().y() <= 1) or (pieza3.position().y() <= 1) or (pieza4.position().y() <= 1)){
+			movimientosFiguras.subir(1 - pieza1.position().y().min(pieza2.position().y()).min(pieza3.position().y()).min(pieza4.position().y()))
 		}
 	}
 	
@@ -269,26 +280,26 @@ object colisiones{
 //para no mover una pieza encima de otra y disparar una colisión.
 
 object movimientosFiguras{
-	method moverDerecha(){
-		pieza4.position(pieza4.position().right(1))
-		pieza3.position(pieza3.position().right(1))
-		pieza2.position(pieza2.position().right(1))
-		pieza1.position(pieza1.position().right(1))
+	method moverDerecha(n){
+		pieza4.position(pieza4.position().right(n))
+		pieza3.position(pieza3.position().right(n))
+		pieza2.position(pieza2.position().right(n))
+		pieza1.position(pieza1.position().right(n))
 	}
 	
-	method subir(){
-		pieza1.position(pieza1.position().up(1))
-		pieza2.position(pieza2.position().up(1))
-		pieza3.position(pieza3.position().up(1))
-		pieza4.position(pieza4.position().up(1))
+	method subir(n){
+		pieza1.position(pieza1.position().up(n))
+		pieza2.position(pieza2.position().up(n))
+		pieza3.position(pieza3.position().up(n))
+		pieza4.position(pieza4.position().up(n))
 		colisiones.hayColision(pieza1, pieza2, pieza3, pieza4)
 	}
 	
-	method bajar(){
-		pieza4.position(pieza4.position().down(1))
-		pieza3.position(pieza3.position().down(1))
-		pieza2.position(pieza2.position().down(1))
-		pieza1.position(pieza1.position().down(1))
+	method bajar(n){
+		pieza4.position(pieza4.position().down(n))
+		pieza3.position(pieza3.position().down(n))
+		pieza2.position(pieza2.position().down(n))
+		pieza1.position(pieza1.position().down(n))
 		colisiones.hayColision(pieza1, pieza2, pieza3, pieza4)
 	}
 }
@@ -325,6 +336,7 @@ object i{																					//1 - 2 - 3 - 4
 			pieza4.position(pieza4.position().right(1).up(1))
 			piezaActual.rotacion(0)
 		}
+		colisiones.hayColisionSuperiorInferior()
 	}
 }
 
@@ -335,6 +347,33 @@ object lDerecha{																			//		  1
 		pieza3.position(posicionInicialPieza.left(1))
 		pieza4.position(posicionInicialPieza)
 	}
+	
+	method rotarDerecha(){
+		if (piezaActual.rotacion() == 0){
+			pieza1.position(pieza1.position().left(1))
+			pieza3.position(pieza3.position().down(1))
+			pieza2.position(pieza2.position().right(1))
+			pieza4.position(pieza4.position().down(1))
+			piezaActual.rotacion(1)
+		}else if (piezaActual.rotacion() == 1){
+			pieza1.position(pieza1.position().left(1).down(1))
+			pieza3.position(pieza3.position().right(1).up(1))
+			pieza4.position(pieza4.position().left(2))
+			piezaActual.rotacion(2)
+		}else if (piezaActual.rotacion() == 2){
+			pieza1.position(pieza1.position().up(1))
+			pieza2.position(pieza2.position().up(1))
+			pieza3.position(pieza3.position().left(1))
+			pieza4.position(pieza4.position().right(1))
+			piezaActual.rotacion(3)
+		}else if (piezaActual.rotacion() == 3){
+			pieza1.position(pieza1.position().right(2))
+			pieza2.position(pieza2.position().left(1).down(1))
+			pieza4.position(pieza4.position().right(1).up(1))
+			piezaActual.rotacion(0)
+		}
+		colisiones.hayColisionSuperiorInferior()
+	}
 }
 
 object lIzquierda{																			//1
@@ -343,6 +382,33 @@ object lIzquierda{																			//1
 		pieza2.position(posicionInicialPieza.left(2))
 		pieza3.position(posicionInicialPieza.left(1))
 		pieza4.position(posicionInicialPieza)
+	}
+	
+	method rotarDerecha(){
+		if (piezaActual.rotacion() == 0){
+			pieza1.position(pieza1.position().right(1))
+			pieza2.position(pieza2.position().right(2).up(1))
+			pieza4.position(pieza4.position().left(1).down(1))
+			piezaActual.rotacion(1)
+		}else if (piezaActual.rotacion() == 1){
+			pieza1.position(pieza1.position().left(1).down(1))
+			pieza3.position(pieza3.position().right(1))
+			pieza2.position(pieza2.position().left(1).down(1))
+			pieza4.position(pieza4.position().right(1))
+			piezaActual.rotacion(2)
+		}else if (piezaActual.rotacion() == 2){
+			pieza1.position(pieza1.position().right(1).up(1))
+			pieza3.position(pieza3.position().left(2).down(1))
+			pieza4.position(pieza4.position().left(1))
+			piezaActual.rotacion(3)
+		}else if (piezaActual.rotacion() == 3){
+			pieza1.position(pieza1.position().left(1))
+			pieza2.position(pieza2.position().left(1))
+			pieza3.position(pieza3.position().right(1).up(1))
+			pieza4.position(pieza4.position().right(1).up(1))
+			piezaActual.rotacion(0)
+		}
+		colisiones.hayColisionSuperiorInferior()
 	}
 }
 
@@ -353,6 +419,21 @@ object nDerecha{																			//	  1
 		pieza3.position(posicionInicialPieza)
 		pieza4.position(posicionInicialPieza.left(1).down(1))
 	}
+	
+	method rotarDerecha(){
+		if (piezaActual.rotacion() == 0){
+			pieza1.position(pieza1.position().left(2).down(1))
+			pieza4.position(pieza4.position().right(1))
+			pieza3.position(pieza3.position().left(1).down(1))
+			piezaActual.rotacion(1)
+		}else if (piezaActual.rotacion() == 1){
+			pieza1.position(pieza1.position().right(2).up(1))
+			pieza4.position(pieza4.position().left(1))
+			pieza3.position(pieza3.position().right(1).up(1))
+			piezaActual.rotacion(0)
+		}
+		colisiones.hayColisionSuperiorInferior()
+	}
 }
 
 object nIzquierda{																			//1
@@ -361,6 +442,21 @@ object nIzquierda{																			//1
 		pieza2.position(posicionInicialPieza.left(1))
 		pieza3.position(posicionInicialPieza)
 		pieza4.position(posicionInicialPieza.down(1))
+	}
+	
+	method rotarDerecha(){
+		if (piezaActual.rotacion() == 0){
+			pieza3.position(pieza3.position().left(1).down(1))
+			pieza1.position(pieza1.position().right(1).down(1))
+			pieza2.position(pieza2.position().right(2))
+			piezaActual.rotacion(1)
+		}else if (piezaActual.rotacion() == 1){
+			pieza3.position(pieza3.position().right(1).up(1))
+			pieza1.position(pieza1.position().left(1).up(1))
+			pieza2.position(pieza2.position().left(2))
+			piezaActual.rotacion(0)
+		}
+		colisiones.hayColisionSuperiorInferior()
 	}
 }
 
@@ -390,6 +486,6 @@ object t{																					//	  1
 			pieza4.position(pieza4.position().right(1).up(1))
 			piezaActual.rotacion(0)
 		}
-		
+		colisiones.hayColisionSuperiorInferior()
 	}
 }
