@@ -3,7 +3,12 @@ import consola.*
 
 const posicionInicialPieza = game.at(-2,6)										//Posicion desde la cual cae la pieza
 const formas = [cuadrado, i, lDerecha, lIzquierda, nDerecha, nIzquierda, t]		//Colección de las figuras
-const columnas_en_juego = [columna1, columna2, columna3]		
+const columnas_en_juego = [
+	columna1, columna2, columna3,columna4,
+	columna5,columna6, columna7, columna8,
+	columna9, columna10,columna11, columna12,
+	columna13, columna14,columna15, columna16
+]		
 
 class Juego {
 	var property position = null
@@ -73,26 +78,30 @@ class Juego {
 }
 
 class PiezaInvisible {
+	var property pieza = false
 	var property position
 }
 
 class Pieza {
+	var property pieza = true
 	var property position
 	var property image = "src/assets/img/cuadrado.png"
 	
-	method cambiarColor(pieza){
-		image = "src/assets/img/" + pieza + ".png"
+	method cambiarColor(_pieza){
+		image = "src/assets/img/" + _pieza + ".png"
 	}
 }
 //No se usa game.boardGround() porque no se pueden definir dos fondos diferentes
 object fondo{
+	var property pieza = false
 	method position() = game.origin().left(1) //La posicion del fondo es (-1,0) para que el objeto que lo contiene no colisione con nada
 	method image() = "src/assets/img/background.png"
+	
 }
 
 object reloj{
 	var property contador = 0
-	
+	var property pieza = false
 	method text() = "Puntaje: " + contador.toString()
 	method textColor() = "FFFFFF"
 	method position() = game.at(1,11)
@@ -123,6 +132,7 @@ const barrera10 = new PiezaInvisible (position = game.at(game.width(), 10))
 
 class ColumnaLlena {
 	var llena = false
+	var property pieza = false
 	var x
 	const columna = [
 			game.at(x,1),
@@ -154,6 +164,9 @@ class ColumnaLlena {
 		return columna
 	}
 	
+	method volver_vacia() {
+		llena = false
+	}
 
 }
 
@@ -175,6 +188,7 @@ object columna15 inherits ColumnaLlena(x=2) {}
 object columna16 inherits ColumnaLlena(x=1) {}
 
 object piezaActual{
+	var property pieza = true
 	var numeroFigura
 	var property figura
 	var property ultimoMovimiento = "derecha"
@@ -253,8 +267,15 @@ object colisiones{
 		}
 		
 		columnas_en_juego.forEach{column => column.estaLlena()}
-		const columnas_llenas = columnas_en_juego.filter{column => column.llena_completa() == not false}.map{column => column.obtenerTodasLasPosiciones()}
-		columnas_llenas.forEach{posiciones => posiciones.forEach{par_ordenado => game.removeVisual(game.getObjectsIn(par_ordenado).first())}}
+		const columnas_llenas = columnas_en_juego.filter{column => column.llena_completa() == not false}
+		const llenas = columnas_llenas.map{column => column.obtenerTodasLasPosiciones()}
+		llenas.forEach{posiciones => posiciones.forEach{par_ordenado => self.romper_y_mover(par_ordenado)}}
+		columnas_llenas.forEach{columna => columna.volver_vacia()}
+	}
+	
+	method romper_y_mover(par_ordenado) {
+		game.removeVisual(game.getObjectsIn(par_ordenado).first()) 
+		game.allVisuals().forEach{pieza => pieza.position().right(1)}
 	}
 }
 
