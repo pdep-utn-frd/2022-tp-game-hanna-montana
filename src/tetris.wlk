@@ -268,7 +268,6 @@ object colisiones{
 			piezaActual.ultimoMovimiento("derecha")
 		}
 		
-		// Romper columnas
 		columnas_en_juego.forEach{column => column.estaLlena()}
 		const columnas_llenas = columnas_en_juego.filter{column => column.llena_completa() == not false}
 		const veces = columnas_llenas.size()
@@ -284,7 +283,7 @@ object colisiones{
 		columnas_llenas.forEach{columna => columna.volver_vacia()}
 		
 		if (minima_columna > 0) { 
-			veces.times({i =>  self.mover(minima_columna)})
+			veces.times({i =>  self.mover(minima_columna+i)})
 		}
 		
 	}
