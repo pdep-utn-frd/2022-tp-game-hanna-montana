@@ -3,10 +3,12 @@ import consola.*
 
 const posicionInicialPieza = game.at(-2,6)										//Posicion desde la cual cae la pieza
 const formas = [cuadrado, i, lDerecha, lIzquierda, nDerecha, nIzquierda, t]		//Colección de las figuras
+const columnas_en_juego = [columna1, columna2, columna3]		
 
 class Juego {
 	var property position = null
 	var property color
+	
 	
 	method iniciar(){
 		game.addVisual(fondo)
@@ -28,7 +30,7 @@ class Juego {
 		game.addVisual(columna1)
 		game.addVisual(columna2)
 		game.addVisual(columna3)
-			
+
 		keyboard.down().onPressDo{
 			piezaActual.bajar()
 		}
@@ -66,6 +68,7 @@ class Juego {
 	
 	method image() = "src/assets/img/tetrisLogo.png"
 	
+	method obtener_columnas() = columnas_en_juego
 
 }
 
@@ -249,8 +252,8 @@ object colisiones{
 			piezaActual.ultimoMovimiento("derecha")
 		}
 		
-		const posiblesColumnasLlenas = [columna1, columna2, columna3]		
-		const columnas_llenas = posiblesColumnasLlenas.forEach{column => { column.estaLlena()}}.filter{column => column.llena_completa() == not false}.map{column => column.obtenerTodasLasPosiciones()}
+		columnas_en_juego.forEach{column => column.estaLlena()}
+		const columnas_llenas = columnas_en_juego.filter{column => column.llena_completa() == not false}.map{column => column.obtenerTodasLasPosiciones()}
 		columnas_llenas.forEach{posiciones => posiciones.forEach{par_ordenado => game.removeVisual(game.getObjectsIn(par_ordenado).first())}}
 	}
 }
