@@ -61,6 +61,8 @@ class Juego {
 	
 	method terminar(){
 		game.stop()
+		//sonidogameover.play()
+	
 	}
 	
 	method reiniciar(){
@@ -74,6 +76,21 @@ class Juego {
 	method obtener_columnas() = columnas_en_juego
 
 }
+
+object gameover{
+	method image() = "src/assets/img/gameover.png"
+	method position() = game.at(3.5,2)
+	method gameOver(){
+	    game.removeTickEvent("reloj") 
+		game.addVisual(self)
+	}
+}
+
+//object sonidogameover{
+//	method play(){
+//     game.sound("").play()
+//	} 
+//}
 
 class PiezaInvisible {
 	var property pieza = false
@@ -218,6 +235,8 @@ object piezaActual{
 	
 	method chocar(){
 		colisiones.figuraChocar()
+		
+
 	}
 	
 	method rotarDerecha(){
@@ -253,11 +272,17 @@ object colisiones{
 	
 	method figuraChocar(){
 		if (piezaActual.ultimoMovimiento() == "derecha"){
+			if ((pieza1.position().x()<0) or (pieza2.position().x()<0) or (pieza3.position().x()<0) or (pieza4.position().x()<0)){
+				gameover.gameOver()
+			}
+			else{
 			game.addVisual(new Pieza(position = pieza1.position().left(1), image = "src/assets/img/" + piezaActual.figura() + ".png"))
 			game.addVisual(new Pieza(position = pieza2.position().left(1), image = "src/assets/img/" + piezaActual.figura() + ".png"))
 			game.addVisual(new Pieza(position = pieza3.position().left(1), image = "src/assets/img/" + piezaActual.figura() + ".png"))
 			game.addVisual(new Pieza(position = pieza4.position().left(1), image = "src/assets/img/" + piezaActual.figura() + ".png"))
 			piezaActual.cambiarPieza()
+			}
+			
 		}
 		if (piezaActual.ultimoMovimiento() == "bajar"){
 			piezaActual.subir()
