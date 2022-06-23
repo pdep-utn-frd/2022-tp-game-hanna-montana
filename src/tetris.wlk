@@ -28,7 +28,7 @@ class Juego {
 		game.addVisual(columna1)
 		game.addVisual(columna2)
 		game.addVisual(columna3)
-		
+			
 		keyboard.down().onPressDo{
 			piezaActual.bajar()
 		}
@@ -121,58 +121,55 @@ const barrera10 = new PiezaInvisible (position = game.at(game.width(), 10))
 class ColumnaLlena {
 	var llena = false
 	var x
-	method text() = x.toString()+" - Llena: " + llena.toString()
+	const columna = [
+			game.at(x,1),
+			game.at(x,2),
+			game.at(x,3),
+			game.at(x,4),
+			game.at(x,5),
+			game.at(x,6),
+			game.at(x,7),
+			game.at(x,8),
+			game.at(x,9),
+			game.at(x,10)
+	]
+	method text() = llena.toString()
 	method textColor() = "FFFFFF"
 	method position() = game.at(x,11)
+
 	
 	method estaLlena() {
-		llena = self.generadorColumna().all{posicion => game.getObjectsIn(posicion).size() == 1}
+		llena = columna.all{posicion => game.getObjectsIn(posicion).size() == 1}
+		return null
+	}
+	
+	method llena_completa() {
 		return llena
 	}
 	
-	method generadorColumna() {	
-		return [
-			game.at(x,1),
-			game.at(x,2),
-			game.at(x,3),
-			game.at(x,4),
-			game.at(x,5),
-			game.at(x,6),
-			game.at(x,7),
-			game.at(x,8),
-			game.at(x,9)
-		]
+	method obtenerTodasLasPosiciones() {
+		return columna
 	}
 	
-	method todas_las_posiciones_posibles() {
-		return [
-			game.at(x+1,1),
-			game.at(x+1,2),
-			game.at(x+1,3),
-			game.at(x+1,4),
-			game.at(x+1,5),
-			game.at(x+1,6),
-			game.at(x+1,7),
-			game.at(x+1,8),
-			game.at(x+1,9),
-			game.at(x,1),
-			game.at(x,2),
-			game.at(x,3),
-			game.at(x,4),
-			game.at(x,5),
-			game.at(x,6),
-			game.at(x,7),
-			game.at(x,8),
-			game.at(x,9)	
-		]
-	}
-	
+
 }
 
-object columna1 inherits ColumnaLlena(x=15) {}
-object columna2 inherits ColumnaLlena(x=13) {}
-object columna3 inherits ColumnaLlena(x=11) {}
-
+object columna1 inherits ColumnaLlena(x=16) {}
+object columna2 inherits ColumnaLlena(x=15) {}
+object columna3 inherits ColumnaLlena(x=14) {}
+object columna4 inherits ColumnaLlena(x=13) {}
+object columna5 inherits ColumnaLlena(x=12) {}
+object columna6 inherits ColumnaLlena(x=11) {}
+object columna7 inherits ColumnaLlena(x=10) {}
+object columna8 inherits ColumnaLlena(x=9) {}
+object columna9 inherits ColumnaLlena(x=8) {}
+object columna10 inherits ColumnaLlena(x=7) {}
+object columna11 inherits ColumnaLlena(x=6) {}
+object columna12 inherits ColumnaLlena(x=5) {}
+object columna13 inherits ColumnaLlena(x=4) {}
+object columna14 inherits ColumnaLlena(x=3) {}
+object columna15 inherits ColumnaLlena(x=2) {}
+object columna16 inherits ColumnaLlena(x=1) {}
 
 object piezaActual{
 	var numeroFigura
@@ -252,25 +249,9 @@ object colisiones{
 			piezaActual.ultimoMovimiento("derecha")
 		}
 		
-		const posiblesColumnasLlenas = [columna1, columna2, columna3]
-		posiblesColumnasLlenas.forEach{columna => columna.estaLlena()}
-		/*
-		 * ALGORITMO PARA ROMPER LINEAS (FALTA TERMINAR) NO TOCAR XDDD
-		
-		const columnas_llenas = posibles_columnas_llenas.filter{columna => columna.esta_llena() == true}
-		const posiciones_a_remover = columnas_llenas.map{columna => columna.todas_las_posiciones_posibles()}
-		posiciones_a_remover.forEach{
-			pares_ordenados =>
-			pares_ordenados.forEach{
-			par_ordenado => 
-				{
-						if (game.getObjectsIn(par_ordenado).size() == 1) 
-						{
-							game.removeVisual(game.getObjectsIn(par_ordenado).first())
-						}
-				}
-			}
-		}*/
+		const posiblesColumnasLlenas = [columna1, columna2, columna3]		
+		const columnas_llenas = posiblesColumnasLlenas.forEach{column => { column.estaLlena()}}.filter{column => column.llena_completa() == not false}.map{column => column.obtenerTodasLasPosiciones()}
+		columnas_llenas.forEach{posiciones => posiciones.forEach{par_ordenado => game.removeVisual(game.getObjectsIn(par_ordenado).first())}}
 	}
 }
 
