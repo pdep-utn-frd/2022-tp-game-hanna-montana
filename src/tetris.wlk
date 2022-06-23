@@ -88,6 +88,10 @@ class Pieza {
 	method cambiarColor(_pieza){
 		image = "src/assets/img/" + _pieza + ".png"
 	}
+	
+	method caer() {
+		position = position.right(1)
+	}
 }
 //No se usa game.boardGround() porque no se pueden definir dos fondos diferentes
 object fondo{
@@ -266,24 +270,35 @@ object colisiones{
 		
 		columnas_en_juego.forEach{column => column.estaLlena()}
 		const columnas_llenas = columnas_en_juego.filter{column => column.llena_completa() == not false}
-		const minima_columna = columnas_llenas.min{columna => columna.x()}
+		
+		var minima_columna
+		
+		if (columnas_llenas.size() >= 1){
+			minima_columna = columnas_llenas.min{columna => columna.x()}.position().x()
+		} else {
+			minima_columna = 0
+		}
+
 		const llenas = columnas_llenas.map{column => column.obtenerTodasLasPosiciones()}
 		llenas.forEach{posiciones => posiciones.forEach{par_ordenado => self.romper(par_ordenado)}}
 		columnas_llenas.forEach{columna => columna.volver_vacia()}
-		if (minima_columna.position().x() > 0) { 
-			self.mover(minima_columna.position().x())
+		
+		if (minima_columna > 0) { 
+			self.mover(minima_columna)
 		}
+		
 	}
 	
 	
 	method romper(par_ordenado) {
-		game.removeVisual(game.getObjectsIn(par_ordenado).first())
+		game.removeVisual(game.getObjectsIn(par_ordenado).first())	
 	}
 	
 	method mover(minimo){
 		const piezas = game.allVisuals().filter{visual => visual.pieza() == not false}
-		const piezas_para_bajar = piezas.filter{visual => visual.pieza() == not false}.filter{pieza => pieza.position().x()<minimo}
-		piezas_para_bajar.forEach{pieza => pieza.position().right(1)}
+		/*const piezas_para_bajar = piezas.filter{pieza => pieza.position().x()<minimo}
+		piezas_para_bajar.forEach{pieza => pieza.position().left(1)}*/
+		piezas.forEach{pieza => pieza.caer()}
 	}
 }
 
