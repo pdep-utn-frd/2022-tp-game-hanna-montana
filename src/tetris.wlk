@@ -9,7 +9,7 @@ const columnas_en_juego = [
 	columna9, columna10,columna11, columna12,
 	columna13, columna14,columna15, columna16
 ]		
-
+const sonido_break = game.sound("break.mp3")
 class Juego {
 	var property position = null
 	var property color
@@ -32,9 +32,7 @@ class Juego {
 		game.addVisual(barrera9)
 		game.addVisual(barrera10)
 		game.addVisual(reloj)
-		game.addVisual(columna1)
-		game.addVisual(columna2)
-		game.addVisual(columna3)
+
 
 		keyboard.down().onPressDo{
 			piezaActual.bajar()
@@ -133,7 +131,7 @@ const barrera10 = new PiezaInvisible (position = game.at(game.width(), 10))
 class ColumnaLlena {
 	var llena = false
 	var property pieza = false
-	var x
+	var property x
 	const columna = [
 			game.at(x,1),
 			game.at(x,2),
@@ -268,14 +266,24 @@ object colisiones{
 		
 		columnas_en_juego.forEach{column => column.estaLlena()}
 		const columnas_llenas = columnas_en_juego.filter{column => column.llena_completa() == not false}
+		const minima_columna = columnas_llenas.min{columna => columna.x()}
 		const llenas = columnas_llenas.map{column => column.obtenerTodasLasPosiciones()}
-		llenas.forEach{posiciones => posiciones.forEach{par_ordenado => self.romper_y_mover(par_ordenado)}}
+		llenas.forEach{posiciones => posiciones.forEach{par_ordenado => self.romper(par_ordenado)}}
 		columnas_llenas.forEach{columna => columna.volver_vacia()}
+		if (minima_columna.position().x() > 0) { 
+			self.mover(minima_columna.position().x())
+		}
 	}
 	
-	method romper_y_mover(par_ordenado) {
-		game.removeVisual(game.getObjectsIn(par_ordenado).first()) 
-		game.allVisuals().forEach{pieza => pieza.position().right(1)}
+	
+	method romper(par_ordenado) {
+		game.removeVisual(game.getObjectsIn(par_ordenado).first())
+	}
+	
+	method mover(minimo){
+		const piezas = game.allVisuals().filter{visual => visual.pieza() == not false}
+		const piezas_para_bajar = piezas.filter{visual => visual.pieza() == not false}.filter{pieza => pieza.position().x()<minimo}
+		piezas_para_bajar.forEach{pieza => pieza.position().right(1)}
 	}
 }
 
