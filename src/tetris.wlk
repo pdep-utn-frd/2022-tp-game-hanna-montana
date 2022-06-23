@@ -270,9 +270,8 @@ object colisiones{
 		
 		columnas_en_juego.forEach{column => column.estaLlena()}
 		const columnas_llenas = columnas_en_juego.filter{column => column.llena_completa() == not false}
-		
+		const veces = columnas_llenas.size()
 		var minima_columna
-		
 		if (columnas_llenas.size() >= 1){
 			minima_columna = columnas_llenas.min{columna => columna.x()}.position().x()
 		} else {
@@ -284,7 +283,7 @@ object colisiones{
 		columnas_llenas.forEach{columna => columna.volver_vacia()}
 		
 		if (minima_columna > 0) { 
-			self.mover(minima_columna)
+			veces.times({i =>  self.mover()})
 		}
 		
 	}
@@ -294,12 +293,12 @@ object colisiones{
 		game.removeVisual(game.getObjectsIn(par_ordenado).first())	
 	}
 	
-	method mover(minimo){
+	method mover(){
 		const piezas = game.allVisuals().filter{visual => visual.pieza() == not false}
-		/*const piezas_para_bajar = piezas.filter{pieza => pieza.position().x()<minimo}
-		piezas_para_bajar.forEach{pieza => pieza.position().left(1)}*/
 		piezas.forEach{pieza => pieza.caer()}
 	}
+	
+	
 }
 
 
