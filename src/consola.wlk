@@ -42,11 +42,6 @@ object consola {
 	}
 }
 
-
-
-
-
-
 class MenuIconos{
 	var seleccionado = 1
 	const ancho = 3

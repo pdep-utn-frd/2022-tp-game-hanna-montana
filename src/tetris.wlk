@@ -4,11 +4,11 @@ import consola.*
 const posicionInicialPieza = game.at(-2,6)										//Posicion desde la cual cae la pieza
 const formas = [cuadrado, i, lDerecha, lIzquierda, nDerecha, nIzquierda, t]		//Colección de las figuras
 const columnas_en_juego = [
-	columna1, columna2, columna3,columna4,
-	columna5,columna6, columna7, columna8,
-	columna9, columna10,columna11, columna12,
-	columna13, columna14,columna15, columna16
-]		
+	columna1, columna2, columna3, columna4,
+	columna5, columna6, columna7, columna8,
+	columna9, columna10, columna11, columna12,
+	columna13, columna14, columna15, columna16
+]
 const sonido_break = game.sound("break.mp3")
 class Juego {
 	var property position = null
@@ -32,7 +32,7 @@ class Juego {
 		game.addVisual(barrera9)
 		game.addVisual(barrera10)
 		game.addVisual(reloj)
-
+		game.addVisual(maxScore)
 
 		keyboard.down().onPressDo{
 			piezaActual.bajar()
@@ -61,8 +61,6 @@ class Juego {
 	
 	method terminar(){
 		game.stop()
-		//sonidogameover.play()
-	
 	}
 	
 	method reiniciar(){
@@ -76,21 +74,6 @@ class Juego {
 	method obtener_columnas() = columnas_en_juego
 
 }
-
-object gameover{
-	method image() = "src/assets/img/gameover.png"
-	method position() = game.at(3.5,2)
-	method gameOver(){
-	    game.removeTickEvent("reloj") 
-		game.addVisual(self)
-	}
-}
-
-//object sonidogameover{
-//	method play(){
-//     game.sound("").play()
-//	} 
-//}
 
 class PiezaInvisible {
 	var property pieza = false
@@ -106,7 +89,7 @@ class Pieza {
 		image = "src/assets/img/" + _pieza + ".png"
 	}
 	
-	method caer() {
+	method moverDerecha() {
 		position = position.right(1)
 	}
 }
@@ -128,6 +111,25 @@ object reloj{
 	method contar(){
 		contador += 1
 		piezaActual.derecha()
+	}
+}
+
+object maxScore{
+	var property maxScore = 0
+	method text() = "Max Score: " + maxScore
+	method textColor() = "FFFFFF"
+	method position() = game.at(5,11)
+}
+
+object gameover{
+	method image() = "src/assets/img/gameover.png"
+	method position() = game.at(4,2)
+	method gameOver(){
+	    game.removeTickEvent("reloj")
+		game.addVisual(self)
+		if (reloj.contador() > maxScore.maxScore()){
+			maxScore.maxScore(reloj.contador())			
+		}
 	}
 }
 
@@ -175,7 +177,7 @@ class ColumnaLlena {
 		return null
 	}
 	
-	method llena_completa() {
+	method llenaCompleta() {
 		return llena
 	}
 	
@@ -183,7 +185,7 @@ class ColumnaLlena {
 		return columna
 	}
 	
-	method volver_vacia() {
+	method volverVacia() {
 		llena = false
 	}
 
@@ -235,8 +237,6 @@ object piezaActual{
 	
 	method chocar(){
 		colisiones.figuraChocar()
-		
-
 	}
 	
 	method rotarDerecha(){
@@ -294,36 +294,32 @@ object colisiones{
 		}
 		
 		columnas_en_juego.forEach{column => column.estaLlena()}
-		const columnas_llenas = columnas_en_juego.filter{column => column.llena_completa() == not false}
-		const veces = columnas_llenas.size()
-		var minima_columna
-		if (columnas_llenas.size() >= 1){
-			minima_columna = columnas_llenas.min{columna => columna.x()}.position().x()
+		const columnasLlenas = columnas_en_juego.filter{column => column.llenaCompleta() == not false}
+		const veces = columnasLlenas.size()
+		var minimaColumna
+		if (columnasLlenas.size() >= 1){
+			minimaColumna = columnasLlenas.min{columna => columna.x()}.position().x()
 		} else {
-			minima_columna = 0
+			minimaColumna = 0
 		}
 
-		const llenas = columnas_llenas.map{column => column.obtenerTodasLasPosiciones()}
-		llenas.forEach{posiciones => posiciones.forEach{par_ordenado => self.romper(par_ordenado)}}
-		columnas_llenas.forEach{columna => columna.volver_vacia()}
+		const llenas = columnasLlenas.map{column => column.obtenerTodasLasPosiciones()}
+		llenas.forEach{posiciones => posiciones.forEach{parOrdenado => self.romper(parOrdenado)}}
+		columnasLlenas.forEach{columna => columna.volverVacia()}
 		
-		if (minima_columna > 0) { 
-			veces.times({i =>  self.mover(minima_columna+i)})
+		if (minimaColumna > 0) { 
+			veces.times({i =>  self.mover(minimaColumna+i)})
 		}
-		
 	}
 	
-	
-	method romper(par_ordenado) {
-		game.removeVisual(game.getObjectsIn(par_ordenado).first())	
+	method romper(parOrdenado) {
+		game.removeVisual(game.getObjectsIn(parOrdenado).first())	
 	}
 	
 	method mover(minima){
 		const piezas = game.allVisuals().filter{visual => visual.pieza() == not false}
-		piezas.filter{pieza => pieza.position().x() <= minima}.forEach{pieza => pieza.caer()}
+		piezas.filter{pieza => pieza.position().x() <= minima}.forEach{pieza => pieza.moverDerecha()}
 	}
-	 
-	
 }
 
 
