@@ -308,7 +308,7 @@ object colisiones{
 		columnasLlenas.forEach{columna => columna.volverVacia()}
 		
 		if (minimaColumna > 0) { 
-			veces.times({i =>  self.mover(minimaColumna+i)})
+			veces.times({i =>  self.mover(minimaColumna+i-1)})
 		}
 	}
 	
