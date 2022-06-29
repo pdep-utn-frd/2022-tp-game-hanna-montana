@@ -9,11 +9,10 @@ const columnas_en_juego = [
 	columna9, columna10, columna11, columna12,
 	columna13, columna14, columna15, columna16
 ]
-const sonido_break = game.sound("break.mp3")
+
 class Juego {
 	var property position = null
 	var property color
-	
 	
 	method iniciar(){
 		game.addVisual(fondo)
@@ -83,11 +82,7 @@ class PiezaInvisible {
 class Pieza {
 	var property pieza = true
 	var property position
-	var property image = "src/assets/img/cuadrado.png"
-	
-	method cambiarColor(_pieza){
-		image = "src/assets/img/" + _pieza + ".png"
-	}
+	var property image = "src/assets/img/piezaInicial.png"
 	
 	method moverDerecha() {
 		position = position.right(1)
@@ -102,8 +97,8 @@ object fondo{
 }
 
 object reloj{
-	var property contador = 0
 	var property pieza = false
+	var property contador = 0
 	method text() = "Puntaje: " + contador.toString()
 	method textColor() = "FFFFFF"
 	method position() = game.at(1,11)
@@ -115,6 +110,7 @@ object reloj{
 }
 
 object maxScore{
+	var property pieza = false
 	var property maxScore = 0
 	method text() = "Max Score: " + maxScore
 	method textColor() = "FFFFFF"
@@ -122,6 +118,7 @@ object maxScore{
 }
 
 object gameover{
+	var property pieza = false
 	method image() = "src/assets/img/gameover.png"
 	method position() = game.at(4,2)
 	method gameOver(){
@@ -246,10 +243,6 @@ object piezaActual{
 	method cambiarPieza(){
 		numeroFigura = 0.randomUpTo(6)
 		figura = formas.get(numeroFigura)
-		pieza1.cambiarColor(figura)
-		pieza2.cambiarColor(figura)
-		pieza3.cambiarColor(figura)
-		pieza4.cambiarColor(figura)
 		rotacion = 0
 		figura.iniciarPieza()
 	}
