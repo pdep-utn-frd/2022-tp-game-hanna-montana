@@ -1,18 +1,17 @@
 import wollok.game.*
+import figuras.*
 import consola.*
 
 const posicionInicialPieza = game.at(-2,6)										//Posicion desde la cual cae la pieza
 const formas = [cuadrado, i, lDerecha, lIzquierda, nDerecha, nIzquierda, t]		//Colección de las figuras
-const columnas_en_juego = [
-	columna1, columna2, columna3, columna4,
-	columna5, columna6, columna7, columna8,
-	columna9, columna10, columna11, columna12,
-	columna13, columna14, columna15, columna16
+const columnasEnJuego = [	columna1, columna2, columna3, columna4,
+							columna5, columna6, columna7, columna8,
+							columna9, columna10, columna11, columna12,
+							columna13, columna14, columna15, columna16
 ]
 
 class Juego {
 	var property position = null
-	var property color
 	
 	method iniciar(){
 		game.addVisual(fondo)
@@ -49,6 +48,9 @@ class Juego {
 			piezaActual.cambiarPieza()
 			self.reiniciar()
 		}
+		keyboard.q().onPressDo{
+			consola.juegoTerminar(self)
+		}
 		game.onTick(500, "reloj", {reloj.contar()})
 		game.onCollideDo(pieza1, {pieza => piezaActual.chocar()})
 		game.onCollideDo(pieza2, {pieza => piezaActual.chocar()})
@@ -59,7 +61,7 @@ class Juego {
 	}
 	
 	method terminar(){
-		game.stop()
+		
 	}
 	
 	method reiniciar(){
@@ -69,8 +71,6 @@ class Juego {
 	}
 	
 	method image() = "src/assets/img/tetrisLogo.png"
-	
-	method obtener_columnas() = columnas_en_juego
 
 }
 
@@ -88,17 +88,18 @@ class Pieza {
 		position = position.right(1)
 	}
 }
+
 //No se usa game.boardGround() porque no se pueden definir dos fondos diferentes
 object fondo{
 	var property pieza = false
 	method position() = game.origin().left(1) //La posicion del fondo es (-1,0) para que el objeto que lo contiene no colisione con nada
 	method image() = "src/assets/img/background.png"
-	
 }
 
 object reloj{
 	var property pieza = false
 	var property contador = 0
+	
 	method text() = "Puntaje: " + contador.toString()
 	method textColor() = "FFFFFF"
 	method position() = game.at(1,11)
@@ -112,7 +113,7 @@ object reloj{
 object maxScore{
 	var property pieza = false
 	var property maxScore = 0
-	method text() = "Max Score: " + maxScore
+	method text() = "Max Score: " + maxScore.toString()
 	method textColor() = "FFFFFF"
 	method position() = game.at(5,11)
 }
@@ -121,12 +122,17 @@ object gameover{
 	var property pieza = false
 	method image() = "src/assets/img/gameover.png"
 	method position() = game.at(4,2)
-	method gameOver(){
+	
+	method mostrar(){
 	    game.removeTickEvent("reloj")
 		game.addVisual(self)
 		if (reloj.contador() > maxScore.maxScore()){
 			maxScore.maxScore(reloj.contador())			
 		}
+	}
+	
+	method hayGameOver(){
+		return (pieza1.position().x()<0) or (pieza2.position().x()<0) or (pieza3.position().x()<0) or (pieza4.position().x()<0)
 	}
 }
 
@@ -171,7 +177,6 @@ class ColumnaLlena {
 	
 	method estaLlena() {
 		llena = columna.all{posicion => game.getObjectsIn(posicion).size() == 1}
-		return null
 	}
 	
 	method llenaCompleta() {
@@ -182,28 +187,28 @@ class ColumnaLlena {
 		return columna
 	}
 	
-	method volverVacia() {
+	method vaciar() {
 		llena = false
 	}
 
 }
 
-object columna1 inherits ColumnaLlena(x=16) {}
-object columna2 inherits ColumnaLlena(x=15) {}
-object columna3 inherits ColumnaLlena(x=14) {}
-object columna4 inherits ColumnaLlena(x=13) {}
-object columna5 inherits ColumnaLlena(x=12) {}
-object columna6 inherits ColumnaLlena(x=11) {}
-object columna7 inherits ColumnaLlena(x=10) {}
-object columna8 inherits ColumnaLlena(x=9) {}
-object columna9 inherits ColumnaLlena(x=8) {}
-object columna10 inherits ColumnaLlena(x=7) {}
-object columna11 inherits ColumnaLlena(x=6) {}
-object columna12 inherits ColumnaLlena(x=5) {}
-object columna13 inherits ColumnaLlena(x=4) {}
-object columna14 inherits ColumnaLlena(x=3) {}
-object columna15 inherits ColumnaLlena(x=2) {}
-object columna16 inherits ColumnaLlena(x=1) {}
+const columna1 = new ColumnaLlena(x=16)
+const columna2 = new ColumnaLlena(x=15)
+const columna3 = new ColumnaLlena(x=14)
+const columna4 = new ColumnaLlena(x=13)
+const columna5 = new ColumnaLlena(x=12)
+const columna6 = new ColumnaLlena(x=11)
+const columna7 = new ColumnaLlena(x=10)
+const columna8 = new ColumnaLlena(x=9)
+const columna9 = new ColumnaLlena(x=8)
+const columna10 = new ColumnaLlena(x=7)
+const columna11 = new ColumnaLlena(x=6)
+const columna12 = new ColumnaLlena(x=5)
+const columna13 = new ColumnaLlena(x=4)
+const columna14 = new ColumnaLlena(x=3)
+const columna15 = new ColumnaLlena(x=2)
+const columna16 = new ColumnaLlena(x=1)
 
 object piezaActual{
 	var property pieza = true
@@ -237,7 +242,7 @@ object piezaActual{
 	}
 	
 	method rotarDerecha(){
-		figura.rotarDerecha()
+		figura.rotarDerechaDesde(rotacion)
 	}
 	
 	method cambiarPieza(){
@@ -249,33 +254,37 @@ object piezaActual{
 }
 
 object colisiones{
-	method hayColision(visual1, visual2, visual3, visual4){
+	method cambiarUltimoMovimiento(visual1, visual2, visual3, visual4){
 		if ((game.colliders(visual1) == []) and (game.colliders(visual2) == []) and (game.colliders(visual3) == []) and (game.colliders(visual4) == [])){
 			piezaActual.ultimoMovimiento("derecha")
 		}
 	}
 	
+	method seTraspasoLimiteSuperior(){
+		return (pieza1.position().y() >= 10) or (pieza2.position().y() >= 10) or (pieza3.position().y() >= 10) or (pieza4.position().y() >= 10)
+	}
+	
+	method seTraspasoLimiteInferior(){
+		return (pieza1.position().y() <= 1) or (pieza2.position().y() <= 1) or (pieza3.position().y() <= 1) or (pieza4.position().y() <= 1)
+	}
+	
 	method hayColisionSuperiorInferior(){
-		if ((pieza1.position().y() >= 10) or (pieza2.position().y() >= 10) or (pieza3.position().y() >= 10) or (pieza4.position().y() >= 10)){
+		if (self.seTraspasoLimiteSuperior()){
 			movimientosFiguras.bajar(pieza1.position().y().max(pieza2.position().y()).max(pieza3.position().y()).max(pieza4.position().y()) - 9)
-		}else if ((pieza1.position().y() <= 1) or (pieza2.position().y() <= 1) or (pieza3.position().y() <= 1) or (pieza4.position().y() <= 1)){
+		}else if (self.seTraspasoLimiteInferior()){
 			movimientosFiguras.subir(1 - pieza1.position().y().min(pieza2.position().y()).min(pieza3.position().y()).min(pieza4.position().y()))
 		}
 	}
 	
 	method figuraChocar(){
 		if (piezaActual.ultimoMovimiento() == "derecha"){
-			if ((pieza1.position().x()<0) or (pieza2.position().x()<0) or (pieza3.position().x()<0) or (pieza4.position().x()<0)){
-				gameover.gameOver()
+			if (gameover.hayGameOver()){
+				gameover.mostrar()
 			}
 			else{
-			game.addVisual(new Pieza(position = pieza1.position().left(1), image = "src/assets/img/" + piezaActual.figura() + ".png"))
-			game.addVisual(new Pieza(position = pieza2.position().left(1), image = "src/assets/img/" + piezaActual.figura() + ".png"))
-			game.addVisual(new Pieza(position = pieza3.position().left(1), image = "src/assets/img/" + piezaActual.figura() + ".png"))
-			game.addVisual(new Pieza(position = pieza4.position().left(1), image = "src/assets/img/" + piezaActual.figura() + ".png"))
+			piezaActual.figura().crearFiguraFija()
 			piezaActual.cambiarPieza()
 			}
-			
 		}
 		if (piezaActual.ultimoMovimiento() == "bajar"){
 			piezaActual.subir()
@@ -286,8 +295,8 @@ object colisiones{
 			piezaActual.ultimoMovimiento("derecha")
 		}
 		
-		columnas_en_juego.forEach{column => column.estaLlena()}
-		const columnasLlenas = columnas_en_juego.filter{column => column.llenaCompleta() == not false}
+		columnasEnJuego.forEach{column => column.estaLlena()}
+		const columnasLlenas = columnasEnJuego.filter{column => column.llenaCompleta() == not false}
 		const veces = columnasLlenas.size()
 		var minimaColumna
 		if (columnasLlenas.size() >= 1){
@@ -298,10 +307,10 @@ object colisiones{
 
 		const llenas = columnasLlenas.map{column => column.obtenerTodasLasPosiciones()}
 		llenas.forEach{posiciones => posiciones.forEach{parOrdenado => self.romper(parOrdenado)}}
-		columnasLlenas.forEach{columna => columna.volverVacia()}
+		columnasLlenas.forEach{columna => columna.vaciar()}
 		
 		if (minimaColumna > 0) { 
-			veces.times({i =>  self.mover(minimaColumna+i-1)})
+			veces.times({i =>  self.mover(minimaColumna + i - 1)})
 		}
 	}
 	
@@ -310,223 +319,9 @@ object colisiones{
 	}
 	
 	method mover(minima){
-		const piezas = game.allVisuals().filter{visual => visual.pieza() == not false}
+		const piezas = game.allVisuals().filter{visual => visual.pieza()}
 		piezas.filter{pieza => pieza.position().x() <= minima}.forEach{pieza => pieza.moverDerecha()}
 	}
 }
 
 
-//----------FIGURAS----------//
-//A la hora de definir los movimientos de cada pieza hay que tener en cuenta las posiciones relativas a las otras piezas
-//para no mover una pieza encima de otra y disparar una colisión.
-
-object movimientosFiguras{
-	method moverDerecha(n){
-		pieza4.position(pieza4.position().right(n))
-		pieza3.position(pieza3.position().right(n))
-		pieza2.position(pieza2.position().right(n))
-		pieza1.position(pieza1.position().right(n))
-	}
-	
-	method subir(n){
-		pieza1.position(pieza1.position().up(n))
-		pieza2.position(pieza2.position().up(n))
-		pieza3.position(pieza3.position().up(n))
-		pieza4.position(pieza4.position().up(n))
-		colisiones.hayColision(pieza1, pieza2, pieza3, pieza4)
-	}
-	
-	method bajar(n){
-		pieza4.position(pieza4.position().down(n))
-		pieza3.position(pieza3.position().down(n))
-		pieza2.position(pieza2.position().down(n))
-		pieza1.position(pieza1.position().down(n))
-		colisiones.hayColision(pieza1, pieza2, pieza3, pieza4)
-	}
-}
-
-object cuadrado{																			// 1 - 2
-	method iniciarPieza(){																	// 3 - 4
-		pieza1.position(posicionInicialPieza.left(1).up(1))
-		pieza2.position(posicionInicialPieza.up(1))
-		pieza3.position(posicionInicialPieza.left(1))
-		pieza4.position(posicionInicialPieza)
-	}
-	method rotarDerecha(){
-		//No hacemos nada ya que no tiene sentido rotar el cuadrado
-	}
-}
-
-object i{																					//1 - 2 - 3 - 4
-	method iniciarPieza(){
-		pieza1.position(posicionInicialPieza.left(3))
-		pieza2.position(posicionInicialPieza.left(2))
-		pieza3.position(posicionInicialPieza.left(1))
-		pieza4.position(posicionInicialPieza)
-	}
-	
-	method rotarDerecha(){
-		if (piezaActual.rotacion() == 0){
-			pieza1.position(pieza1.position().right(2).up(2))
-			pieza2.position(pieza2.position().right(1).up(1))
-			pieza4.position(pieza4.position().left(1).down(1))
-			piezaActual.rotacion(1)
-		}else if (piezaActual.rotacion() == 1){
-			pieza1.position(pieza1.position().left(2).down(2))
-			pieza2.position(pieza2.position().left(1).down(1))
-			pieza4.position(pieza4.position().right(1).up(1))
-			piezaActual.rotacion(0)
-		}
-		colisiones.hayColisionSuperiorInferior()
-	}
-}
-
-object lDerecha{																			//		  1
-	method iniciarPieza(){																	//2 - 3 - 4
-		pieza1.position(posicionInicialPieza.up(1))
-		pieza2.position(posicionInicialPieza.left(2))
-		pieza3.position(posicionInicialPieza.left(1))
-		pieza4.position(posicionInicialPieza)
-	}
-	
-	method rotarDerecha(){
-		if (piezaActual.rotacion() == 0){
-			pieza1.position(pieza1.position().left(1))
-			pieza3.position(pieza3.position().down(1))
-			pieza2.position(pieza2.position().right(1))
-			pieza4.position(pieza4.position().down(1))
-			piezaActual.rotacion(1)
-		}else if (piezaActual.rotacion() == 1){
-			pieza1.position(pieza1.position().left(1).down(1))
-			pieza3.position(pieza3.position().right(1).up(1))
-			pieza4.position(pieza4.position().left(2))
-			piezaActual.rotacion(2)
-		}else if (piezaActual.rotacion() == 2){
-			pieza1.position(pieza1.position().up(1))
-			pieza2.position(pieza2.position().up(1))
-			pieza3.position(pieza3.position().left(1))
-			pieza4.position(pieza4.position().right(1))
-			piezaActual.rotacion(3)
-		}else if (piezaActual.rotacion() == 3){
-			pieza1.position(pieza1.position().right(2))
-			pieza2.position(pieza2.position().left(1).down(1))
-			pieza4.position(pieza4.position().right(1).up(1))
-			piezaActual.rotacion(0)
-		}
-		colisiones.hayColisionSuperiorInferior()
-	}
-}
-
-object lIzquierda{																			//1
-	method iniciarPieza(){																	//2 - 3 - 4
-		pieza1.position(posicionInicialPieza.left(2).up(1))
-		pieza2.position(posicionInicialPieza.left(2))
-		pieza3.position(posicionInicialPieza.left(1))
-		pieza4.position(posicionInicialPieza)
-	}
-	
-	method rotarDerecha(){
-		if (piezaActual.rotacion() == 0){
-			pieza1.position(pieza1.position().right(1))
-			pieza2.position(pieza2.position().right(2).up(1))
-			pieza4.position(pieza4.position().left(1).down(1))
-			piezaActual.rotacion(1)
-		}else if (piezaActual.rotacion() == 1){
-			pieza1.position(pieza1.position().left(1).down(1))
-			pieza3.position(pieza3.position().right(1))
-			pieza2.position(pieza2.position().left(1).down(1))
-			pieza4.position(pieza4.position().right(1))
-			piezaActual.rotacion(2)
-		}else if (piezaActual.rotacion() == 2){
-			pieza1.position(pieza1.position().right(1).up(1))
-			pieza3.position(pieza3.position().left(2).down(1))
-			pieza4.position(pieza4.position().left(1))
-			piezaActual.rotacion(3)
-		}else if (piezaActual.rotacion() == 3){
-			pieza1.position(pieza1.position().left(1))
-			pieza2.position(pieza2.position().left(1))
-			pieza3.position(pieza3.position().right(1).up(1))
-			pieza4.position(pieza4.position().right(1).up(1))
-			piezaActual.rotacion(0)
-		}
-		colisiones.hayColisionSuperiorInferior()
-	}
-}
-
-object nDerecha{																			//	  1
-	method iniciarPieza(){																	//2 - 3
-		pieza1.position(posicionInicialPieza.up(1))											//4
-		pieza2.position(posicionInicialPieza.left(1))
-		pieza3.position(posicionInicialPieza)
-		pieza4.position(posicionInicialPieza.left(1).down(1))
-	}
-	
-	method rotarDerecha(){
-		if (piezaActual.rotacion() == 0){
-			pieza1.position(pieza1.position().left(2).down(1))
-			pieza4.position(pieza4.position().right(1))
-			pieza3.position(pieza3.position().left(1).down(1))
-			piezaActual.rotacion(1)
-		}else if (piezaActual.rotacion() == 1){
-			pieza1.position(pieza1.position().right(2).up(1))
-			pieza4.position(pieza4.position().left(1))
-			pieza3.position(pieza3.position().right(1).up(1))
-			piezaActual.rotacion(0)
-		}
-		colisiones.hayColisionSuperiorInferior()
-	}
-}
-
-object nIzquierda{																			//1
-	method iniciarPieza(){																	//2 - 3
-		pieza1.position(posicionInicialPieza.left(1).up(1))									//	  4
-		pieza2.position(posicionInicialPieza.left(1))
-		pieza3.position(posicionInicialPieza)
-		pieza4.position(posicionInicialPieza.down(1))
-	}
-	
-	method rotarDerecha(){
-		if (piezaActual.rotacion() == 0){
-			pieza3.position(pieza3.position().left(1).down(1))
-			pieza1.position(pieza1.position().right(1).down(1))
-			pieza2.position(pieza2.position().right(2))
-			piezaActual.rotacion(1)
-		}else if (piezaActual.rotacion() == 1){
-			pieza3.position(pieza3.position().right(1).up(1))
-			pieza1.position(pieza1.position().left(1).up(1))
-			pieza2.position(pieza2.position().left(2))
-			piezaActual.rotacion(0)
-		}
-		colisiones.hayColisionSuperiorInferior()
-	}
-}
-
-object t{																					//	  1
-	method iniciarPieza(){																	//2 - 3 - 4
-		pieza1.position(posicionInicialPieza.left(1).up(1))
-		pieza2.position(posicionInicialPieza.left(2))
-		pieza3.position(posicionInicialPieza.left(1))
-		pieza4.position(posicionInicialPieza)
-	}
-	
-	method rotarDerecha(){
-		if (piezaActual.rotacion() == 0){
-			pieza2.position(pieza2.position().right(1))
-			pieza3.position(pieza3.position().right(1))
-			pieza4.position(pieza4.position().left(1).down(1))
-			piezaActual.rotacion(1)
-		}else if (piezaActual.rotacion() == 1){
-			pieza1.position(pieza1.position().left(1).down(1))
-			piezaActual.rotacion(2)
-		}else if (piezaActual.rotacion() == 2){
-			pieza1.position(pieza1.position().right(1).up(1))
-			pieza2.position(pieza2.position().left(1))
-			pieza3.position(pieza3.position().left(1))
-			piezaActual.rotacion(3)
-		}else if (piezaActual.rotacion() == 3){
-			pieza4.position(pieza4.position().right(1).up(1))
-			piezaActual.rotacion(0)
-		}
-		colisiones.hayColisionSuperiorInferior()
-	}
-}

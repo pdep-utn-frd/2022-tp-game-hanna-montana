@@ -4,12 +4,7 @@ import tetris.*
 object consola {
 
 	const juegos = [
-		new Juego(color = "Amarillo"),
-		new Juego(color = "Verde"),
-		new Juego(color = "Rojo"),
-		new Juego(color = "Azul"),
-		new Juego(color = "Naranja"),
-		new Juego(color = "Violeta")
+		new Juego()
 	]
 	
 	var menu 
