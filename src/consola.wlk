@@ -4,7 +4,7 @@ import tetris.*
 object consola {
 
 	const juegos = [
-		new Juego()
+		juego
 	]
 	
 	var menu 
@@ -36,6 +36,7 @@ object consola {
 		self.iniciar()
 	}
 }
+
 
 class MenuIconos{
 	var seleccionado = 1

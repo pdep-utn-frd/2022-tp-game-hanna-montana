@@ -3,16 +3,11 @@ import consola.*
 
 const posicionInicialPieza = game.at(-2,6)										//Posicion desde la cual cae la pieza
 const formas = [cuadrado, i, lDerecha, lIzquierda, nDerecha, nIzquierda, t]		//Colección de las figuras
-const columnas_en_juego = [
-	columna1, columna2, columna3,columna4,
-	columna5,columna6, columna7, columna8,
-	columna9, columna10,columna11, columna12,
-	columna13, columna14,columna15, columna16
-]		
+	
 const sonido_break = game.sound("break.mp3")
-class Juego {
+object juego {
 	var property position = null
-	var property color
+	var property color = "rojo"
 	
 	
 	method iniciar(){
@@ -70,7 +65,11 @@ class Juego {
 	}
 	
 	method image() = "src/assets/img/tetrisLogo.png"
-	method obtener_columnas() = columnas_en_juego
+	method obtener_columnas() {
+		const columnas_en_juego = []
+		16.times{i => columnas_en_juego.add(new ColumnaLlena(x=i))}
+		return columnas_en_juego
+	}
 }
 
 class PiezaInvisible {
@@ -249,7 +248,7 @@ object colisiones{
 	}
 	
 	method ver_columnas_llenas(){
-		const columnas_llenas = columnas_en_juego.filter{column => column.estaLlena()}
+		const columnas_llenas = juego.obtener_columnas().filter{column => column.estaLlena()}
 		var minima_columna
 		if (columnas_llenas.size() >= 1){
 			minima_columna = columnas_llenas.min{columna => columna.x()}.position().x()
