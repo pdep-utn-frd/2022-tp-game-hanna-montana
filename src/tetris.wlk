@@ -148,23 +148,6 @@ class ColumnaLlena {
 
 }
 
-object columna1 inherits ColumnaLlena(x=16) {}
-object columna2 inherits ColumnaLlena(x=15) {}
-object columna3 inherits ColumnaLlena(x=14) {}
-object columna4 inherits ColumnaLlena(x=13) {}
-object columna5 inherits ColumnaLlena(x=12) {}
-object columna6 inherits ColumnaLlena(x=11) {}
-object columna7 inherits ColumnaLlena(x=10) {}
-object columna8 inherits ColumnaLlena(x=9) {}
-object columna9 inherits ColumnaLlena(x=8) {}
-object columna10 inherits ColumnaLlena(x=7) {}
-object columna11 inherits ColumnaLlena(x=6) {}
-object columna12 inherits ColumnaLlena(x=5) {}
-object columna13 inherits ColumnaLlena(x=4) {}
-object columna14 inherits ColumnaLlena(x=3) {}
-object columna15 inherits ColumnaLlena(x=2) {}
-object columna16 inherits ColumnaLlena(x=1) {}
-
 object piezaActual{
 	var property pieza = true
 	var numeroFigura
