@@ -45,6 +45,10 @@ object juego {
 			piezaActual.cambiarPieza()
 			self.reiniciar()
 		}
+		keyboard.q().onPressDo{
+			game.clear()
+			consola.iniciar()
+		}
 		game.onTick(500, "reloj", {reloj.contar()})
 		game.onCollideDo(pieza1, {pieza => piezaActual.chocar()})
 		game.onCollideDo(pieza2, {pieza => piezaActual.chocar()})
@@ -55,7 +59,7 @@ object juego {
 	}
 	
 	method terminar(){
-		game.stop()
+		
 	}
 	
 	method reiniciar(){
